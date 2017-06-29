@@ -10,8 +10,9 @@ var os = require('os');
 var path = require('path');
 var utilities = require('./utilities.js');
 
-var Engine = function (engineFile) {
+var Engine = function (engineFile, engineArgs) {
     this.engineFile = path.normalize(engineFile);
+    this.engineArgs = engineArgs;
 };
 
 util.inherits(Engine, events.EventEmitter);
@@ -24,7 +25,7 @@ util.inherits(Engine, events.EventEmitter);
 Engine.prototype.runProcess = function () {
     var self = this;
     var deferred = Q.defer();
-    this.engineProcess = spawn(this.engineFile);
+    this.engineProcess = spawn(this.engineFile,this.engineArgs);
     var timer;
     this.engineProcess.once('error', function (error) {
         clearInterval(timer);
