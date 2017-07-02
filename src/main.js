@@ -305,4 +305,29 @@ Engine.prototype.quitCommand = function () {
     return deferred.promise;
 };
 
+//This function sends a generic command to the engine. It returns a promise which
+//is resolved once the engine responds anything 
+//@public
+//@method uciCommand
+Engine.prototype.command = function (command) {
+    var self = this;
+    var deferred = Q.defer();
+    var pendingData = "";
+
+    var options = [];
+    var id = {};
+    var engineStdoutListener = function (data) {
+        var lines = utilities.getLines(pendingData+data);
+        pendingData = lines.incompleteLine ? lines.incompleteLine : "";
+        if(lines.incompleteLine === undefined) {
+            self.engineProcess.stdout.removeListener('data', engineStdoutListener);
+            deferred.resolve(data.toString());
+        }
+    };
+
+    this.engineProcess.stdout.on('data', engineStdoutListener);
+    this.engineProcess.stdin.write(command + endOfLine);
+    return deferred.promise;
+};
+
 module.exports = Engine;
