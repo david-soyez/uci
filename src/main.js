@@ -313,15 +313,12 @@ Engine.prototype.command = function (command) {
     var self = this;
     var deferred = Q.defer();
     var pendingData = "";
-
-    var options = [];
-    var id = {};
     var engineStdoutListener = function (data) {
         var lines = utilities.getLines(pendingData+data);
         pendingData = lines.incompleteLine ? lines.incompleteLine : "";
         if(lines.incompleteLine === undefined) {
             self.engineProcess.stdout.removeListener('data', engineStdoutListener);
-            deferred.resolve(data.toString());
+            deferred.resolve(lines.lines.join("\n"));
         }
     };
 
