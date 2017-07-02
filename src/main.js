@@ -39,6 +39,9 @@ Engine.prototype.runProcess = function () {
         }
 
     }, 100);
+
+
+
     return deferred.promise;
 };
 
@@ -312,17 +315,11 @@ Engine.prototype.quitCommand = function () {
 Engine.prototype.command = function (command) {
     var self = this;
     var deferred = Q.defer();
-    var pendingData = "";
-    var engineStdoutListener = function (data) {
-        var lines = utilities.getLines(pendingData+data);
-        pendingData = lines.incompleteLine ? lines.incompleteLine : "";
-        if(lines.incompleteLine === undefined) {
-            self.engineProcess.stdout.removeListener('data', engineStdoutListener);
-            deferred.resolve(lines.lines.join("\n"));
-        }
-    };
 
-    this.engineProcess.stdout.on('data', engineStdoutListener);
+    this.engineProcess.stdout.on('data', function(data) {
+        deferred.resolve(data.toString());
+    });
+
     this.engineProcess.stdin.write(command + endOfLine);
     return deferred.promise;
 };
