@@ -27,15 +27,17 @@ Engine.prototype.runProcess = function () {
     var deferred = Q.defer();
     this.engineProcess = spawn(this.engineFile,this.engineArgs);
     var timer;
-    this.engineProcess.once('error', function (error) {
+    this.engineProcess.stderr.on('data', function (error) {
         clearInterval(timer);
-        deferred.reject(error);
+        deferred.reject(error.toString());
     });
 
     timer = setInterval(function () {
         if (utilities.isProcessRunning(self.engineProcess)) {
             clearInterval(timer);
-            deferred.resolve();
+            self.engineProcess.stdout.on('data', function(data) {
+                deferred.resolve(data.toString());
+            });
         }
 
     }, 100);
@@ -318,6 +320,10 @@ Engine.prototype.command = function (command) {
 
     this.engineProcess.stdout.on('data', function(data) {
         deferred.resolve(data.toString());
+    });
+
+    this.engineProcess.stderr.on('data', function (error) {
+        deferred.reject(error.toString());
     });
 
     this.engineProcess.stdin.write(command + endOfLine);
