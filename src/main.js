@@ -31,7 +31,7 @@ Engine.prototype.runProcess = function () {
         clearInterval(timer);
         deferred.reject(error.toString());
     });
-
+    
     timer = setInterval(function () {
         if (utilities.isProcessRunning(self.engineProcess)) {
             clearInterval(timer);
@@ -40,9 +40,7 @@ Engine.prototype.runProcess = function () {
             });
         }
 
-    }, 100);
-
-
+    }, 1);
 
     return deferred.promise;
 };
