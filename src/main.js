@@ -26,19 +26,13 @@ Engine.prototype.runProcess = function () {
     var self = this;
     var deferred = Q.defer();
     this.engineProcess = spawn(this.engineFile,this.engineArgs);
-    var timer;
     this.engineProcess.stderr.on('data', function (error) {
-        clearInterval(timer);
         deferred.reject(error.toString());
     });
     
-    timer = setInterval(function () {
-        if (utilities.isProcessRunning(self.engineProcess)) {
-            clearInterval(timer);
-            self.engineProcess.stdout.on('data', function(data) {
-                deferred.resolve(data.toString());
-            });
-        }
+    self.engineProcess.stdout.on('data', function(data) {
+        deferred.resolve(data.toString());
+    });
 
     }, 1);
 
