@@ -34,8 +34,6 @@ Engine.prototype.runProcess = function () {
         deferred.resolve(data.toString());
     });
 
-    }, 1);
-
     return deferred.promise;
 };
 
